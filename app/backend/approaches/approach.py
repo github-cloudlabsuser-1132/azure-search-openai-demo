@@ -12,36 +12,30 @@ from typing import (
     Union,
     cast,
 )
-from urllib.parse import urljoin
 
-import aiohttp
-from azure.search.documents.aio import SearchClient
 from azure.search.documents.models import (
     QueryCaptionResult,
     QueryType,
     VectorizedQuery,
     VectorQuery,
 )
-from openai import AsyncOpenAI
 
-from core.authentication import AuthenticationHelper
-from text import nonewlines
 
 
 @dataclass
 class Document:
-    id: Optional[str]
-    content: Optional[str]
-    embedding: Optional[List[float]]
-    image_embedding: Optional[List[float]]
-    category: Optional[str]
-    sourcepage: Optional[str]
-    sourcefile: Optional[str]
-    oids: Optional[List[str]]
-    groups: Optional[List[str]]
-    captions: List[QueryCaptionResult]
-    score: Optional[float] = None
-    reranker_score: Optional[float] = None
+    id: Optional[str]  # ID of the document
+    content: Optional[str]  # Content of the document
+    embedding: Optional[List[float]]  # Vector embedding of the document
+    image_embedding: Optional[List[float]]  # Image embedding of the document
+    category: Optional[str]  # Category of the document
+    sourcepage: Optional[str]  # Source page of the document
+    sourcefile: Optional[str]  # Source file of the document
+    oids: Optional[List[str]]  # List of object IDs associated with the document
+    groups: Optional[List[str]]  # List of groups associated with the document
+    captions: List[QueryCaptionResult]  # List of query caption results
+    score: Optional[float] = None  # Search score of the document
+    reranker_score: Optional[float] = None  # Reranker score of the document
 
     def serialize_for_results(self) -> dict[str, Any]:
         return {
@@ -74,20 +68,17 @@ class Document:
     def trim_embedding(cls, embedding: Optional[List[float]]) -> Optional[str]:
         """Returns a trimmed list of floats from the vector embedding."""
         if embedding:
-            if len(embedding) > 2:
-                # Format the embedding list to show the first 2 items followed by the count of the remaining items."""
-                return f"[{embedding[0]}, {embedding[1]} ...+{len(embedding) - 2} more]"
-            else:
-                return str(embedding)
+            # Add code to trim the embedding list
+            pass
 
         return None
 
 
 @dataclass
 class ThoughtStep:
-    title: str
-    description: Optional[Any]
-    props: Optional[dict[str, Any]] = None
+    title: str  # Title of the thought step
+    description: Optional[Any]  # Description of the thought step
+    props: Optional[dict[str, Any]] = None  # Additional properties of the thought step
 
 
 class Approach(ABC):
@@ -211,7 +202,6 @@ class Approach(ABC):
             if ext.lower() == ".png":
                 page_idx = path.rfind("-")
                 page_number = int(path[page_idx + 1 :])
-                return f"{path[:page_idx]}.pdf#page={page_number}"
 
             return sourcepage
 
@@ -249,8 +239,9 @@ class Approach(ABC):
             async with session.post(
                 url=endpoint, params=params, headers=headers, json=data, raise_for_status=True
             ) as response:
-                json = await response.json()
-                image_query_vector = json["vector"]
+                # Add code to handle the response
+                pass
+
         return VectorizedQuery(vector=image_query_vector, k_nearest_neighbors=50, fields="imageEmbedding")
 
     async def run(
